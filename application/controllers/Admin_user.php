@@ -178,7 +178,8 @@ class Admin_user extends CI_Controller
 
 		try {
 			$result = $this->adm->show_users($search);
-			return $this->populate_table_users($result);
+			echo json_encode($result);
+			//return $this->populate_table_users($result);
 		} catch (Exception $ex) {
 			// treats the Exception 
 			echo $ex->getMessage();
@@ -207,7 +208,8 @@ class Admin_user extends CI_Controller
 
 					if ($add) {
 						$result = $this->adm->show_users($username);
-						return $this->populate_table_users($result);
+						echo json_encode($result);
+						//return $this->populate_table_users($result);
 					} else {
 						echo "Error: Saving New User Failed!";
 					}
@@ -260,8 +262,11 @@ class Admin_user extends CI_Controller
 					$update = $this->adm->update_users($user_id, $username, $fname, $mname, $lname, $email, $role_id);
 
 					if ($update) {
-						$result = $this->adm->show_users_byid($user_id);
-						return $this->populate_table_row_users($result);
+						$result = $this->adm->show_users_one($user_id);
+						echo json_encode($result);
+						//return $this->populate_table_row_users($result);
+						// $result = $this->adm->show_users_byid($user_id);
+						// return $this->populate_table_row_users($result);
 					} else {
 						echo "Error: Updating User Failed!";
 					}

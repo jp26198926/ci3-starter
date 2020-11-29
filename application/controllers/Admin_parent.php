@@ -96,13 +96,19 @@ class Admin_parent extends CI_Controller
 	{
 		$search = $this->input->get('search');
 
-		$result = $this->adm->show_parent($search);
-
-		if (is_array($result)) {
-			return $this->populate_table_parent($result);
-		} else {
-			return $result;
+		try {
+			$result = $this->adm->show_parent($search);
+			echo json_encode($result);
+		} catch (Exception $ex) {
+			echo $ex->getMessage();
 		}
+
+
+		// if (is_array($result)) {
+		// 	return $this->populate_table_parent($result);
+		// } else {
+		// 	return $result;
+		// }
 	}
 
 	public function add_parent()
@@ -117,8 +123,15 @@ class Admin_parent extends CI_Controller
 			$add = $this->adm->add_parent($parent_name, $parent_description, $parent_icon, $parent_order);
 
 			if ($add) {
-				$result = $this->adm->show_parent($parent_name);
-				return $this->populate_table_parent($result);
+				try {
+					$result = $this->adm->show_parent($parent_name);
+					echo json_encode($result);
+				} catch (Exception $ex) {
+					echo $ex->getMessage();
+				}
+
+
+				//return $this->populate_table_parent($result);
 			}
 		} else {
 			echo "Error: Role Name is Required!";

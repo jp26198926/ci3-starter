@@ -99,12 +99,11 @@ class Admin_role extends CI_Controller
 	{
 		$search = $this->input->get('search');
 
-		$result = $this->adm->show_role($search);
-
-		if (is_array($result)) {
-			return $this->populate_table_role($result);
-		} else {
-			return $result;
+		try {
+			$result = $this->adm->show_role($search);
+			echo json_encode($result);
+		} catch (Exception $ex) {
+			echo $ex->getMessage();
 		}
 	}
 
@@ -113,12 +112,15 @@ class Admin_role extends CI_Controller
 		$role_name = $this->input->post('role_name');
 
 		if ($role_name) {
-
-			$add = $this->adm->add_role($role_name);
-
-			if ($add) {
-				$result = $this->adm->show_role($role_name);
-				return $this->populate_table_role($result);
+			try {
+				$add = $this->adm->add_role($role_name);
+				if ($add) {
+					$result = $this->adm->show_role($role_name);
+					echo json_encode($result);
+					//return $this->populate_table_role($result);
+				}
+			} catch (Exception $ex) {
+				echo $ex->getMessage();
 			}
 		} else {
 			echo "Error: Role Name is Required!";
@@ -166,12 +168,16 @@ class Admin_role extends CI_Controller
 		$role_name = $this->input->post('role_name');
 
 		if ($role_id && $role_name) {
+			try {
+				$save = $this->adm->duplicate_role($role_id, $role_name);
 
-			$save = $this->adm->duplicate_role($role_id, $role_name);
-
-			if ($save) {
-				$result = $this->adm->show_role_by_id($save);
-				return $this->populate_table_role($result);
+				if ($save) {
+					$result = $this->adm->show_role_by_id($save);
+					echo json_encode($result);
+					//return $this->populate_table_role($result);
+				}
+			} catch (Exception $ex) {
+				echo $ex->getMessage();
 			}
 		} else {
 			echo "Error: Role Name is Required!";
@@ -224,14 +230,17 @@ class Admin_role extends CI_Controller
 	//start mod_perm
 	function show_mod_perm()
 	{
-		$role_id = $this->input->post('role_id');
+		$role_id = intval($this->input->post('role_id'));
 
-		$result = $this->adm->show_mod_perm($role_id);
-
-		if (is_array($result)) {
-			return $this->populate_table_mod_perm($result);
+		if ($role_id) {
+			try {
+				$result = $this->adm->show_mod_perm($role_id);
+				echo json_encode($result);
+			} catch (Exception $ex) {
+				echo $ex->getMessage();
+			}
 		} else {
-			return $result;
+			echo $this->default_error_msg;
 		}
 	}
 
@@ -247,7 +256,8 @@ class Admin_role extends CI_Controller
 				$add = $this->adm->add_mod_perm($role_id, $module_id, $permission_id);
 				if ($add) {
 					$result = $this->adm->show_mod_perm($role_id);
-					return $this->populate_table_mod_perm($result);
+					echo json_encode($result);
+					//return $this->populate_table_mod_perm($result);
 				}
 			} catch (Exception $ex) {
 				// treats the Exception 

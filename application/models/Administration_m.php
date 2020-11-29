@@ -45,6 +45,28 @@ class Administration_m extends CI_Model
 		}
 	}
 
+	function show_users_one($id)
+	{
+
+		$this->db->select("u.id as id, u.username as username, CONCAT(u.lname,', ',u.fname,' ',u.mname) as fullname,
+							  u.email as email, u.status_id as status_id,
+							  r.role_name as role_name,
+							  s.status as status");
+		$this->db->from('user u');
+		$this->db->join('admin_role r', 'r.id=u.role_id', 'left');
+		$this->db->join('user_status s', 's.id=u.status_id', 'left');
+		$this->db->where('u.id', $id);
+		$this->db->order_by('u.username');
+
+		if ($query = $this->db->get()) {
+			return $query->result();
+		} else {
+			$error = $this->db->error();
+			throw new Exception("Error: " . $error['message']);
+		}
+	}
+
+
 	function show_users_byid($id)
 	{
 
@@ -154,7 +176,8 @@ class Administration_m extends CI_Model
 		if ($query = $this->db->get()) {
 			return $query->result();
 		} else {
-			return "Error: " . $this->db->error();
+			$error = $this->db->error();
+			throw new Exception("Error: " . $error['message']);
 		}
 	}
 
@@ -185,7 +208,8 @@ class Administration_m extends CI_Model
 		if ($this->db->affected_rows() > 0) {
 			return true;
 		} else {
-			return false;
+			$error = $this->db->error();
+			throw new Exception("Error: " . $error['message']);
 		}
 	}
 
@@ -269,7 +293,9 @@ class Administration_m extends CI_Model
 		if ($query = $this->db->get()) {
 			return $query->result();
 		} else {
-			return "Error: " . $this->db->error();
+			//return "Error: " . $this->db->error();
+			$error = $this->db->error();
+			throw new Exception("Error: " . $error['message']);
 		}
 	}
 
@@ -424,11 +450,11 @@ class Administration_m extends CI_Model
 			$this->db->where("p.permission LIKE '%{$search}%'");
 		}
 
-
 		if ($query = $this->db->get()) {
 			return $query->result();
 		} else {
-			return "Error: " . $this->db->error();
+			$error = $this->db->error();
+			throw new Exception("Error: " . $error['message']);
 		}
 	}
 
@@ -492,7 +518,8 @@ class Administration_m extends CI_Model
 		if ($query = $this->db->get()) {
 			return $query->result();
 		} else {
-			return "Error: " . $this->db->error();
+			$error = $this->db->error();
+			throw new Exception("Error: " . $error['message']);
 		}
 	}
 

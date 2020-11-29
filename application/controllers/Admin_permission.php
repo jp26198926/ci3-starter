@@ -95,13 +95,19 @@ class Admin_permission extends CI_Controller
 	{
 		$search = $this->input->get('search');
 
-		$result = $this->adm->show_permission($search);
-
-		if (is_array($result)) {
-			return $this->populate_table_permission($result);
-		} else {
-			return $result;
+		try {
+			$result = $this->adm->show_permission($search);
+			echo json_encode($result);
+		} catch (Exception $ex) {
+			echo $ex->getMessage();
 		}
+
+
+		// if (is_array($result)) {
+		// 	return $this->populate_table_permission($result);
+		// } else {
+		// 	return $result;
+		// }
 	}
 
 	function add_permission()
@@ -109,12 +115,16 @@ class Admin_permission extends CI_Controller
 		$permission_name = $this->input->post('permission_name');
 
 		if ($permission_name) {
+			try {
+				$add = $this->adm->add_permission($permission_name);
 
-			$add = $this->adm->add_permission($permission_name);
-
-			if ($add) {
-				$result = $this->adm->show_permission($permission_name);
-				return $this->populate_table_permission($result);
+				if ($add) {
+					$result = $this->adm->show_permission($permission_name);
+					echo json_encode($result);
+					//return $this->populate_table_permission($result);
+				}
+			} catch (Exception $ex) {
+				echo $ex->getMessage();
 			}
 		} else {
 			echo "Error: Role Name is Required!";

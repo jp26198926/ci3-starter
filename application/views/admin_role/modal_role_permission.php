@@ -52,7 +52,8 @@
 					</div>
 				</div>
 				<hr />
-				<div class="row" style="max-height: 290px; overflow-y: scroll;">
+				<!-- <div class="row" style="max-height: 290px; overflow-y: scroll;"> -->
+				<div class="row">
 					<div class="col-sm-12">
 						<table id='tbl_mod_perm' class="table table-striped table-bordered table-responsive" style="font-size: small;">
 							<thead>

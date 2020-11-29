@@ -96,13 +96,20 @@ class Admin_module extends CI_Controller
 	{
 		$search = $this->input->get('search');
 
-		$result = $this->adm->show_module($search);
-
-		if (is_array($result)) {
-			return $this->populate_table_module($result);
-		} else {
-			return $result;
+		try {
+			$result = $this->adm->show_module($search);
+			echo json_encode($result);
+		} catch (Exception $ex) {
+			echo $ex->getMessage();
 		}
+
+
+
+		// if (is_array($result)) {
+		// 	//return $this->populate_table_module($result);
+		// } else {
+		// 	return $result;
+		// }
 	}
 
 	function add_module()
@@ -119,8 +126,13 @@ class Admin_module extends CI_Controller
 			$add = $this->adm->add_module($module_name, $module_description, $parent_id);
 
 			if ($add) {
-				$result = $this->adm->show_module($module_name);
-				return $this->populate_table_module($result);
+				try {
+					$result = $this->adm->show_module($module_name);
+					echo json_encode($result);
+					//return $this->populate_table_module($result);
+				} catch (Exception $ex) {
+					echo $ex->getMessage();
+				}
 			}
 		} else {
 			echo "Error: Role Name is Required!";

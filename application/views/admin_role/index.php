@@ -80,19 +80,27 @@
 
 							<div class="row">
 								<div class="col-xs-12">
-									<table id="tbl_role" class="table  table-bordered table-hover table-striped table-fixed-header">
-										<thead class="header">
-											<tr>
-												<th>OPTION</th>
-												<th>ROLE NAME</th>
-											</tr>
-										</thead>
-										<tbody>
-											<tr>
-												<td align='center' colspan='2'>Use search button to display record</td>
-											</tr>
-										</tbody>
-									</table>
+									<div class="table-header clearfix">
+										Result List <span id="lbl_result_info" class="badge badge-warning"></span>
+										<div class="pull-right" style="padding-right: 0.5em; padding-top: 0.4em;">
+											<div class="pull-right tableTools-container"></div>
+										</div>
+									</div>
+									<div>
+										<table id="tbl_role" class="table  table-bordered table-hover table-striped table-fixed-header">
+											<thead class="header">
+												<tr>
+													<th>OPTION</th>
+													<th>ROLE NAME</th>
+												</tr>
+											</thead>
+											<tbody>
+												<tr>
+													<td align='center' colspan='2'>Use search button to display record</td>
+												</tr>
+											</tbody>
+										</table>
+									</div>
 								</div>
 							</div><!-- /.row -->
 
@@ -125,10 +133,236 @@
 
 	<!-- inline scripts related to this page -->
 	<script>
-		//default
+		var current_row;
+		var current_data;
+		//functions
+
+		function reload_table(table_id, dataSet = []) {
+			var myTable =
+				$(table_id)
+				//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+				.DataTable({
+					destroy: true,
+					bAutoWidth: false,
+					"aoColumns": [{
+							"bSortable": false,
+							className: "text-center"
+						},
+						null
+					],
+					data: dataSet,
+					"aaSorting": [],
+
+
+					//"bProcessing": true,
+					//"bServerSide": true,
+					//"sAjaxSource": "http://127.0.0.1/table.php"	,
+
+					//,
+					//"sScrollY": "200px",
+					//"bPaginate": false,
+
+					//"sScrollX": "100%",
+					//"sScrollXInner": "120%",
+					//"bScrollCollapse": true,
+					//Note: if you are applying horizontal scrolling (sScrollX) on a ".table-bordered"
+					//you may want to wrap the table inside a "div.dataTables_borderWrap" element
+
+					//"iDisplayLength": 50
+
+
+					// select: {
+					// 	style: 'multi'
+					// }
+				});
+
+			$.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons btn-overlap btn-group btn-overlap';
+
+			new $.fn.dataTable.Buttons(myTable, {
+				buttons: [
+					//   {
+					// 	"extend": "colvis",
+					// 	"text": "<i class='fa fa-search bigger-110 blue'></i> <span class='hidden'>Show/hide columns</span>",
+					// 	"className": "btn btn-white btn-primary btn-bold",
+					// 	columns: ':not(:first):not(:last)'
+					//   },
+					{
+						"extend": "copy",
+						"text": "<i class='fa fa-copy bigger-110 pink'></i> <span class='hidden'>Copy to clipboard</span>",
+						"className": "btn btn-white btn-primary btn-bold",
+						"title": "Copy",
+						"data-toggle": "tooltip"
+					},
+					{
+						"extend": "csv",
+						"text": "<i class='fa fa-file-excel-o bigger-110 green'></i> <span class='hidden'>Export to CSV</span>",
+						"className": "btn btn-white btn-primary btn-bold"
+					},
+					{
+						"extend": "excel",
+						"text": "<i class='fa fa-file-excel-o bigger-110 green'></i> <span class='hidden'>Export to Excel</span>",
+						"className": "btn btn-white btn-primary btn-bold"
+					},
+					{
+						"extend": "pdf",
+						"text": "<i class='fa fa-file-pdf-o bigger-110 red'></i> <span class='hidden'>Export to PDF</span>",
+						"className": "btn btn-white btn-primary btn-bold"
+					},
+					{
+						"extend": "print",
+						"text": "<i class='fa fa-print bigger-110 grey'></i> <span class='hidden'>Print</span>",
+						"className": "btn btn-white btn-primary btn-bold",
+						autoPrint: false,
+						message: 'This print was produced using the Print button for DataTables'
+					}
+				]
+			});
+			myTable.buttons().container().appendTo($('.tableTools-container'));
+		}
+
+		function populate_table(table_ref, result_data) {
+			var dataSet = [];
+			$.each(result_data, function(index, value) {
+				var id = value.id;
+				var option = "";
+
+				<?php
+				if ($role_id == 1 || $this->custom_function->module_permission("modify", $module_permission)) { //admin or has add permissioin
+				?>
+					option = "<button id='" + id + "' class='btn_role_modify btn btn-xs btn-info fa fa-pencil' title='Modify' data-toggle='tooltip'></button>";
+
+				<?php
+				}
+				?>
+				option += "		<button id='" + id + "' class='btn_role_permission btn btn-xs btn-danger fa fa-list' title='Permission' data-toggle='tooltip'></button>";
+				option += "		<button id='" + id + "' class='btn_role_duplicate btn btn-xs btn-warning fa fa-copy' title='Duplicate' data-toggle='tooltip'></button>";
+
+				var role_name = value.role_name;
+
+				dataSet.push([option, role_name]);
+			});
+
+			reload_table(table_ref, dataSet);
+		}
+
+		function reload_table_perm(table_id, dataSet = []) {
+			var myTable =
+				$(table_id)
+				//.wrap("<div class='dataTables_borderWrap' />")   //if you are applying horizontal scrolling (sScrollX)
+				.DataTable({
+					destroy: true,
+					bAutoWidth: false,
+					"aoColumns": [{
+							"bSortable": false,
+							className: "text-center"
+						},
+						null,
+						null
+					],
+					data: dataSet,
+					"aaSorting": [],
+
+					lengthMenu: [
+						[5, 10, 20, 50, -1],
+						[5, 10, 20, 50, "All"]
+					],
+
+
+					//"bProcessing": true,
+					//"bServerSide": true,
+					//"sAjaxSource": "http://127.0.0.1/table.php"	,
+
+					//,
+					//"sScrollY": "200px",
+					//"bPaginate": false,
+
+					//"sScrollX": "100%",
+					//"sScrollXInner": "120%",
+					//"bScrollCollapse": true,
+					//Note: if you are applying horizontal scrolling (sScrollX) on a ".table-bordered"
+					//you may want to wrap the table inside a "div.dataTables_borderWrap" element
+
+					//"iDisplayLength": 50
+
+
+					// select: {
+					// 	style: 'multi'
+					// }
+				});
+
+			$.fn.dataTable.Buttons.defaults.dom.container.className = 'dt-buttons btn-overlap btn-group btn-overlap';
+
+			// new $.fn.dataTable.Buttons(myTable, {
+			// 	buttons: [
+			// 		//   {
+			// 		// 	"extend": "colvis",
+			// 		// 	"text": "<i class='fa fa-search bigger-110 blue'></i> <span class='hidden'>Show/hide columns</span>",
+			// 		// 	"className": "btn btn-white btn-primary btn-bold",
+			// 		// 	columns: ':not(:first):not(:last)'
+			// 		//   },
+			// 		{
+			// 			"extend": "copy",
+			// 			"text": "<i class='fa fa-copy bigger-110 pink'></i> <span class='hidden'>Copy to clipboard</span>",
+			// 			"className": "btn btn-white btn-primary btn-bold",
+			// 			"title": "Copy",
+			// 			"data-toggle": "tooltip"
+			// 		},
+			// 		{
+			// 			"extend": "csv",
+			// 			"text": "<i class='fa fa-file-excel-o bigger-110 green'></i> <span class='hidden'>Export to CSV</span>",
+			// 			"className": "btn btn-white btn-primary btn-bold"
+			// 		},
+			// 		{
+			// 			"extend": "excel",
+			// 			"text": "<i class='fa fa-file-excel-o bigger-110 green'></i> <span class='hidden'>Export to Excel</span>",
+			// 			"className": "btn btn-white btn-primary btn-bold"
+			// 		},
+			// 		{
+			// 			"extend": "pdf",
+			// 			"text": "<i class='fa fa-file-pdf-o bigger-110 red'></i> <span class='hidden'>Export to PDF</span>",
+			// 			"className": "btn btn-white btn-primary btn-bold"
+			// 		},
+			// 		{
+			// 			"extend": "print",
+			// 			"text": "<i class='fa fa-print bigger-110 grey'></i> <span class='hidden'>Print</span>",
+			// 			"className": "btn btn-white btn-primary btn-bold",
+			// 			autoPrint: false,
+			// 			message: 'This print was produced using the Print button for DataTables'
+			// 		}
+			// 	]
+			// });
+			// myTable.buttons().container().appendTo($('.tableTools-container'));
+		}
+
+		function populate_table_perm(table_ref, result_data) {
+			var dataSet = [];
+			$.each(result_data, function(index, value) {
+				var id = value.id;
+				var option = "";
+
+				<?php
+				if ($role_id == 1 || $this->custom_function->module_permission("delete", $module_permission)) { //admin or has add permissioin
+				?>
+					option = "<button id='" + id + "' class='btn_mod_perm_remove btn btn-xs btn-warning fa fa-times' title='Remove' data-toggle='tooltip'></button>";
+
+				<?php
+				}
+				?>
+
+				var module_name = value.module_name;
+				var permission = value.permission;
+
+				dataSet.push([option, module_name, permission]);
+			});
+
+			reload_table_perm(table_ref, dataSet);
+		}
+
 		$(document).ready(function() {
+			reload_table("#tbl_role");
 			$("#btn_role_search").trigger("click");
 		});
+
 
 		//start role
 		$(document).on("keypress", "#txt_role_search", function(e) {
@@ -150,9 +384,8 @@
 					$('#txt_role_search').trigger('select', 'focus');
 				} else {
 					if (data) {
-						$("#tbl_role tbody").html(data);
-					} else {
-						$("#tbl_role tbody").html("<tr><td align='center' colspan='2'>No Record to display</td></tr>");
+						result_data = JSON.parse(data);
+						populate_table("#tbl_role", result_data);
 					}
 
 					$('[data-toggle="tooltip"]').tooltip({
@@ -195,9 +428,8 @@
 						$('#txt_role_name').trigger('select', 'focus');
 					} else {
 						if (data) {
-							$("#tbl_role tbody").html(data);
-						} else {
-							$("#tbl_role tbody").html("<tr><td align='center' colspan='2'>No Record to display</td></tr>");
+							result_data = JSON.parse(data);
+							populate_table("#tbl_role", result_data);
 						}
 
 						$("#modal_role_new").modal('hide');
@@ -216,6 +448,10 @@
 			e.preventDefault();
 
 			var id = $(this).attr('id');
+
+			var table = $('#tbl_parent').DataTable();
+			current_row = table.row($(this).parents('tr'));
+			current_data = current_row.data();
 
 			if (id) {
 				$.post("<?= base_url(); ?>admin_role/info_role", {
@@ -270,11 +506,8 @@
 						$("#modal_role_modify  .modal_error").stop(true, true).show().delay(15000).fadeOut("slow");
 						$('#txt_role_name_update').trigger('select', 'focus');
 					} else {
-						if (data) {
-							$("#tbl_role tbody #tr_" + id).html(data);
-						} else {
-							$("#tbl_role tbody #tr_" + id).html("<tr><td align='center' colspan='2'>No Record to display</td></tr>");
-						}
+						current_data[1] = role_name;
+						current_row.data(current_data).invalidate();
 
 						$("#modal_role_modify").modal('hide');
 						$('[data-toggle="tooltip"]').tooltip({
@@ -347,10 +580,14 @@
 						$('#txt_role_name_duplicate').trigger('select', 'focus');
 					} else {
 						if (data) {
-							$("#tbl_role tbody").html(data);
-						} else {
-							$("#tbl_role tbody").html("<tr><td align='center' colspan='2'>No Record to display</td></tr>");
+							result_data = JSON.parse(data);
+							populate_table("#tbl_role", result_data);
 						}
+						// if (data) {
+						// 	$("#tbl_role tbody").html(data);
+						// } else {
+						// 	$("#tbl_role tbody").html("<tr><td align='center' colspan='2'>No Record to display</td></tr>");
+						// }
 
 						$("#modal_role_duplicate").modal('hide');
 						$('[data-toggle="tooltip"]').tooltip({
@@ -383,9 +620,8 @@
 
 					} else {
 						if (data) {
-							$("#tbl_mod_perm tbody").html(data);
-						} else {
-							$("#tbl_mod_perm tbody").html("<tr><td align='center' colspan='2'>No Record to display</td></tr>");
+							result_data = JSON.parse(data);
+							populate_table_perm("#tbl_mod_perm", result_data);
 						}
 
 						$('[data-toggle="tooltip"]').tooltip({
@@ -435,9 +671,8 @@
 							}
 						} else {
 							if (data) {
-								$("#tbl_mod_perm tbody").html(data);
-							} else {
-								$("#tbl_mod_perm tbody").html("<tr><td align='center' colspan='3'>No Record to display</td></tr>");
+								result_data = JSON.parse(data);
+								populate_table_perm("#tbl_mod_perm", result_data);
 							}
 
 							$('[data-toggle="tooltip"]').tooltip({
@@ -460,6 +695,9 @@
 			var id = $(this).attr('id');
 
 			if (id) {
+				var table = $('#tbl_mod_perm').DataTable();
+				var current_row = table.row($(this).parents('tr'));
+
 				$('.modal_error, .modal_button').hide();
 				$('.modal_waiting').show();
 
@@ -477,7 +715,10 @@
 						$("#modal_role_permission  .modal_error").stop(true, true).show().delay(15000).fadeOut("slow");
 						$("#modal_role_permission .modal_error_msg").text(data);
 					} else {
-						$("#tbl_mod_perm tbody #tr_" + id).hide();
+						bootbox.alert("Successfully removed!");
+						current_row.remove().draw();
+
+						//$("#tbl_mod_perm tbody #tr_" + id).hide();
 					}
 				});
 			} else {
