@@ -53,6 +53,7 @@
 									<small>
 										<i class="ace-icon fa fa-angle-double-right"></i>
 										<?= $page_name; ?>
+										<span id="lbl_count" class="badge badge-warning">0</span>
 									</small>
 
 
@@ -219,6 +220,8 @@
 
 		function populate_table(table_ref, result_data) {
 			var dataSet = [];
+			var result_count = result_data.length;
+
 			$.each(result_data, function(index, value) {
 				var id = value.id;
 				var option = "";
@@ -237,6 +240,7 @@
 				dataSet.push([option, permission_name]);
 			});
 
+			$("#lbl_count").text(result_count);
 			reload_table(table_ref, dataSet);
 		}
 

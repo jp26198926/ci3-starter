@@ -307,7 +307,9 @@
 			}
 			
 			
-			var websocket = new WebSocket("ws://localhost:8090/clinic/socket/chat_server.php"); 
+			//var websocket = new WebSocket("ws://localhost:8090/clinic/socket/chat_server.php"); 
+			var chat_server_addr = "<?= $_SERVER['SERVER_NAME']; ?>";
+			var websocket = new WebSocket("ws://" + chat_server_addr + ":8090/socket/chat_server.php"); 
 			
 			$(document).ready(function(){
 					

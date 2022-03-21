@@ -123,19 +123,23 @@ class Admin_module extends CI_Controller
 		if ($module_name && $module_description && $parent_id) {
 
 			//$add = $this->adm->add_module($module_name, $module_description, $module_icon, $module_parent, $module_parent_id);
-			$add = $this->adm->add_module($module_name, $module_description, $parent_id);
+			try {
+				$add = $this->adm->add_module($module_name, $module_description, $parent_id);
 
-			if ($add) {
-				try {
-					$result = $this->adm->show_module($module_name);
-					echo json_encode($result);
-					//return $this->populate_table_module($result);
-				} catch (Exception $ex) {
-					echo $ex->getMessage();
+				if ($add) {
+					try {
+						$result = $this->adm->show_module($module_name);
+						echo json_encode($result);
+						//return $this->populate_table_module($result);
+					} catch (Exception $ex) {
+						echo $ex->getMessage();
+					}
 				}
+			} catch (Exception $ex) {
+				echo $ex->getMessage();
 			}
 		} else {
-			echo "Error: Role Name is Required!";
+			echo "Error: Module Name is Required!";
 		}
 	}
 
@@ -144,12 +148,16 @@ class Admin_module extends CI_Controller
 		$module_id = $this->input->post('id');
 
 		if ($module_id) {
-			$result = $this->adm->info_module($module_id);
+			try {
+				$result = $this->adm->info_module($module_id);
 
-			if ($result) {
-				echo json_encode($result);
-			} else {
-				echo "Error: Unable to fetch record!";
+				if ($result) {
+					echo json_encode($result);
+				} else {
+					echo "Error: Unable to fetch record!";
+				}
+			} catch (Exception $ex) {
+				echo $ex->getMessage();
 			}
 		} else {
 			echo "Error: Critical error encountered!";
@@ -184,7 +192,7 @@ class Admin_module extends CI_Controller
 				}
 			}
 		} else {
-			echo "Error: Role Name is Required!";
+			echo "Error: Module Name is Required!";
 		}
 	}
 

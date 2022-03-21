@@ -39,7 +39,7 @@
 		}
 		
 		function allow_parent($role_id){
-			$this->db->select('distinct(m.parent_id), p.parent_name, p.parent_icon');
+			$this->db->select('distinct(m.parent_id), p.parent_name, p.parent_icon,p.parent_order');
 			$this->db->from('admin_mod_perm mp');
 			$this->db->join('admin_module m','m.id=mp.module_id','left');
 			$this->db->join('admin_parent p','p.parent_id = m.parent_id', 'left');
@@ -74,5 +74,3 @@
 		}
 
 	}
-
-?>
